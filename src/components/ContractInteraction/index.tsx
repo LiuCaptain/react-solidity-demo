@@ -59,10 +59,14 @@ export default function ContractInteraction() {
   const handleUpdate = async () => {
     await runWithLoading(async () => {
       try {
-        const otherOwner = "0x2ad99498D90c835EAd930427042bd0953B036F6a"
         const contract = new Contract(contractAddress, ownerAbi, signer.current)
-        const tx = await contract.changeOwner(otherOwner)
+        const otherOwnerOne = "0x3b11ed78c98D249648b9262d806E74AFCAf9b7cD" // account 1
+        const tx = await contract.changeOwner(otherOwnerOne)
+        // const otherOwnerTwo = "0x2ad99498D90c835EAd930427042bd0953B036F6a" // account 2
+        // const tx = await contract.changeOwner(otherOwnerTwo)
+
         await tx.wait()
+        toast.success("合约更新成功！")
       } catch (err: any) {
         toast.error(err.reason)
       }
