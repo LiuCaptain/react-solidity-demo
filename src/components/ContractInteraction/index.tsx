@@ -1,8 +1,9 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import cn from "classnames"
-import { BrowserProvider, getDefaultProvider, Contract } from "ethers"
+import { BrowserProvider, Contract } from "ethers"
 import type { Signer, AbstractProvider } from "ethers"
+import toast from "@/uilts/toast"
 import styles from "./index.module.scss"
 import ownerAbi from "@/abi/owner.js"
 
@@ -54,6 +55,7 @@ export default function ContractInteraction() {
     })
   }
 
+  // 更新状态
   const handleUpdate = async () => {
     await runWithLoading(async () => {
       try {
@@ -62,19 +64,10 @@ export default function ContractInteraction() {
         const tx = await contract.changeOwner(otherOwner)
         await tx.wait()
       } catch (err: any) {
-        console.log(err.reason)
+        toast.error(err.reason)
       }
     })
   }
-
-  useEffect(() => {
-    if (window.ethereum == null) {
-      alert("MetaMask not installed; using read-only defaults")
-      provider.current = getDefaultProvider()
-    } else {
-      provider.current = new BrowserProvider(window.ethereum)
-    }
-  }, [])
 
   return (
     <section className={styles.panel}>
