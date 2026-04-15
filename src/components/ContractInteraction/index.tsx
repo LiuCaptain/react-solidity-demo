@@ -1,11 +1,13 @@
 "use client"
 import { useEffect, useRef } from "react"
 import cn from "classnames"
-import { BrowserProvider, getDefaultProvider } from "ethers"
+import { BrowserProvider, getDefaultProvider, Contract } from "ethers"
 import type { Signer, AbstractProvider } from "ethers"
 import styles from "./index.module.scss"
+import ownerAbi from "@/abi/owner.js"
 
 export default function ContractInteraction() {
+  const contractAddress = "0x003CEb1E0eD23881f46b9a9EA19a54Ad82F7625B"
   const signer = useRef<Signer | null>(null)
   const provider = useRef<AbstractProvider | BrowserProvider | null>(null)
 
@@ -16,13 +18,10 @@ export default function ContractInteraction() {
       alert("MetaMask not installed")
       return false
     }
-
     try {
       signer.current = await (provider.current as BrowserProvider).getSigner()
-
-      // 获取连接钱包地址
       const address = await signer.current?.getAddress()
-      console.log("当前钱包连接地址", address)
+      console.log("address:", address)
     } catch (err) {
       console.log("err", err)
       alert("连接钱包失败，请稍后重试。")
@@ -30,8 +29,15 @@ export default function ContractInteraction() {
   }
 
   // 读取状态
-  const handleRead = () => {
-    console.log("读取状态")
+  const handleRead = async () => {
+    console.log("contractAddress", contractAddress)
+    try {
+      const contract = new Contract(contractAddress, ownerAbi, provider.current)
+      const owner = await contract.getOwner()
+      console.log("owner", owner)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   useEffect(() => {
