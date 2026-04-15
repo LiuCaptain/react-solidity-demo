@@ -1,7 +1,7 @@
 "use client"
 import { useRef, useState } from "react"
 import cn from "classnames"
-import { BrowserProvider, Contract } from "ethers"
+import { BrowserProvider, Contract, verifyMessage } from "ethers"
 import type { Signer, AbstractProvider } from "ethers"
 import toast from "@/uilts/toast"
 import styles from "./index.module.scss"
@@ -73,6 +73,19 @@ export default function ContractInteraction() {
     })
   }
 
+  const handleSign = async () => {
+    await runWithLoading(async () => {
+      const message = "Hello, World!"
+      const signature = await signer.current?.signMessage(message)
+      console.log("signature", signature)
+
+      const recoveredAddress = await verifyMessage(message, signature!)
+      console.log("recoveredAddress", recoveredAddress)
+
+      toast.success(`签名成功！签名地址：${recoveredAddress}`)
+    })
+  }
+
   return (
     <section className={styles.panel}>
       {loading ? (
@@ -107,7 +120,12 @@ export default function ContractInteraction() {
         >
           修改状态
         </button>
-        <button type="button" className={cn(styles.btn, styles.btnSign)} disabled={loading}>
+        <button
+          type="button"
+          className={cn(styles.btn, styles.btnSign)}
+          disabled={loading}
+          onClick={handleSign}
+        >
           签名
         </button>
       </div>
