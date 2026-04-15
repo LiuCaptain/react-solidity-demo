@@ -42,15 +42,27 @@ export default function ContractInteraction() {
     await runWithLoading(async () => {
       try {
         const network = await (provider.current as BrowserProvider).getNetwork()
-        const code = await (provider.current as BrowserProvider).getCode(contractAddress)
+        // const code = await (provider.current as BrowserProvider).getCode(contractAddress)
         console.log("network", network)
-        console.log("code", code)
 
         const contract = new Contract(contractAddress, ownerAbi, provider.current)
         const owner = await contract.getOwner()
         console.log("owner", owner)
       } catch (err) {
         console.log(err)
+      }
+    })
+  }
+
+  const handleUpdate = async () => {
+    await runWithLoading(async () => {
+      try {
+        const otherOwner = "0x2ad99498D90c835EAd930427042bd0953B036F6a"
+        const contract = new Contract(contractAddress, ownerAbi, signer.current)
+        const tx = await contract.changeOwner(otherOwner)
+        await tx.wait()
+      } catch (err: any) {
+        console.log(err.reason)
       }
     })
   }
@@ -90,7 +102,12 @@ export default function ContractInteraction() {
         >
           读取状态
         </button>
-        <button type="button" className={cn(styles.btn, styles.btnWrite)} disabled={loading}>
+        <button
+          type="button"
+          className={cn(styles.btn, styles.btnWrite)}
+          onClick={handleUpdate}
+          disabled={loading}
+        >
           修改状态
         </button>
         <button type="button" className={cn(styles.btn, styles.btnSign)} disabled={loading}>
